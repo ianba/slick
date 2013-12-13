@@ -65,7 +65,7 @@ package object meta{
                   case (_,"Double") => v.toDouble
                   case (StringValue(str),"String") => str
                   case ("NULL",_) if nullable => None
-                  case (_,"String") => v // seen in MySQL
+                  //case (_,"String") => v // seen in MySQL // buggy in postgres, found value 'unchecked'::character varying
                   case ("1","Boolean") => true // seen in MySQL
                   case ("0","Boolean") => false
                   case ("true","Boolean") => true // seen in postgres
