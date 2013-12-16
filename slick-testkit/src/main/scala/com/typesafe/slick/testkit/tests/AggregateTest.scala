@@ -219,4 +219,27 @@ class AggregateTest extends TestkitTest[RelationalTestDB] {
     }
     assert(q4.run.isEmpty)
   }
+
+  // Tests aggregation queries with an identity mapping
+  def testIdentityGroupBy {
+    class Test(tag: Tag) extends Table[(Int, Int)](tag, "test_testIdentityGroupBy") {
+      def id = column[Int]("id")
+      def a = column[Int]("a")
+      def * = (id, a)
+    }
+
+    val test = TableQuery[Test]
+    test.ddl.create
+
+    test ++= Seq((1, 1), (1, 1), (1, 2), (2, 1), (2, 2))
+
+    val resultSet = Set((1, 1), (1, 2), (2, 1), (2, 2))
+
+    val q1 = test.groupBy(x => x).map(_._1)
+    assertEquals(resultSet, q1.run.toSet)
+    val q2 = test.map(x => x).groupBy(_.*).map(_._1)
+    assertEquals(resultSet, q2.run.toSet)
+    val q3 = test.map(x => x).groupBy(x => x).map(_._1)
+    assertEquals(resultSet, q3.run.toSet)
+  }
 }
